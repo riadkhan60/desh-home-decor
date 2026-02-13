@@ -7,10 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:slider": "tsx scripts/seed-slider.ts",
-    "seed:products": "tsx scripts/seed-products.ts",
-    "seed:categories": "tsx scripts/seed-categories.ts",
-    "seed:showcase-reviews": "tsx scripts/seed-showcase-reviews.ts",
     "seed:admin": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
