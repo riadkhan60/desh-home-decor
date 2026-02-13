@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Hind_Siliguri } from 'next/font/google';
 import './globals.css';
 import { ReactQueryProvider } from '@/components/react-query-provider';
 import { CartProvider } from '@/lib/cart-context';
+import { PWARegister } from '@/components/pwa-register';
 import { Toaster } from 'sonner';
 
 const geistSans = Geist({
@@ -51,6 +52,13 @@ export const metadata: Metadata = {
     description:
       'Explore handcrafted lighting and decor inspired by Bengali craftsmanship to transform your home with warm, luxurious light.',
   },
+  manifest: '/manifest.webmanifest',
+  themeColor: '#D4AF37',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Deshi Home Decor',
+  },
 };
 
 export default function RootLayout({
@@ -63,6 +71,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${hindSiliguri.variable} antialiased`}
       >
+        <PWARegister />
         <ReactQueryProvider>
           <CartProvider>
             {children}

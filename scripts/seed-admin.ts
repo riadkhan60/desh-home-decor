@@ -20,8 +20,8 @@ async function main() {
     where: { email: "admin@shilpini.com" },
     update: {},
     create: {
-      email: "admin@shilpini.com",
-      password: "shilpini5432", // Plain text password
+      email: "admin@home.com",
+      password: "home.ahr", // Plain text password
       name: "Admin User",
       role: "admin",
     },
