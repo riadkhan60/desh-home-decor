@@ -1,7 +1,30 @@
 'use server';
 
+import { unstable_cache, revalidatePath, revalidateTag } from 'next/cache';
 import { prisma } from '../prisma';
-import { revalidatePath } from 'next/cache';
+
+// Cached for homepage - avoids refetch when navigating back
+export const getCollectionsCached = unstable_cache(
+  async () => {
+    try {
+      const collections = await prisma.collection.findMany({
+        where: { isActive: true },
+        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+        include: {
+          products: {
+            select: { productId: true },
+          },
+        },
+      });
+      return { success: true, data: collections };
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+      return { success: false, error: 'Failed to fetch', data: [] };
+    }
+  },
+  ['collections-home'],
+  { revalidate: 3600, tags: ['collections'] },
+);
 
 export async function getCollections(query?: string) {
   try {
@@ -62,6 +85,7 @@ export async function createCollection(data: {
 
     revalidatePath('/admin/collections');
     revalidatePath('/(public)', 'layout');
+    revalidateTag('collections');
 
     return { success: true, data: collection };
   } catch (error) {
@@ -98,6 +122,7 @@ export async function updateCollection(
 
     revalidatePath('/admin/collections');
     revalidatePath('/(public)', 'layout');
+    revalidateTag('collections');
 
     return { success: true, data: collection };
   } catch (error) {
@@ -114,6 +139,7 @@ export async function deleteCollection(id: string) {
 
     revalidatePath('/admin/collections');
     revalidatePath('/(public)', 'layout');
+    revalidateTag('collections');
 
     return { success: true };
   } catch (error) {
@@ -131,6 +157,7 @@ export async function toggleCollectionStatus(id: string, isActive: boolean) {
 
     revalidatePath('/admin/collections');
     revalidatePath('/(public)', 'layout');
+    revalidateTag('collections');
 
     return { success: true };
   } catch (error) {

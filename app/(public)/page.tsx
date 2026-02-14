@@ -6,10 +6,10 @@ import HomeShowcaseReviewsSection from '@/components/home-showcase-reviews-secti
 import HomeCategoriesSection from '@/components/home-categories-section';
 import HomeCollectionsSection from '@/components/home-collections-section';
 import { getHeroSlides } from '@/lib/actions/sliders';
-import { getProducts, getAllCategories } from '@/lib/actions/products-list';
-import { getCollections } from '@/lib/actions/collections';
-import { getHomeCollectionProducts } from '@/lib/actions/products';
-import { getHomeCategories } from '@/lib/actions/categories';
+import { getProducts, getProductsCached, getAllCategoriesCached } from '@/lib/actions/products-list';
+import { getCollectionsCached } from '@/lib/actions/collections';
+import { getHomeCollectionProductsCached } from '@/lib/actions/products';
+import { getHomeCategoriesCached } from '@/lib/actions/categories';
 import { getShowcaseReviews } from '@/lib/actions/reviews';
 
 // Revalidate this page every 1 hour (ISR)
@@ -29,21 +29,27 @@ export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const { category, collection, search, sort, skip } = params;
 
+  const hasFilters = !!(category || collection || search || (skip && parseInt(skip) > 0));
+  const sortBy = sort || 'newest';
+  const skipNum = skip ? parseInt(skip) : 0;
+
   const [slides, productsData, collectionsRes, categories, homeCollectionsData, homeCategories, showcaseReviews] =
     await Promise.all([
       getHeroSlides(),
-      getProducts({
-        categoryId: category,
-        collection,
-        search,
-        sortBy: sort,
-        skip: skip ? parseInt(skip) : 0,
-        take: 20,
-      }),
-      getCollections(),
-      getAllCategories(),
-      getHomeCollectionProducts(),
-      getHomeCategories(6),
+      hasFilters
+        ? getProducts({
+            categoryId: category,
+            collection,
+            search,
+            sortBy,
+            skip: skipNum,
+            take: 20,
+          })
+        : getProductsCached(),
+      getCollectionsCached(),
+      getAllCategoriesCached(),
+      getHomeCollectionProductsCached(),
+      getHomeCategoriesCached(),
       getShowcaseReviews(10),
     ]);
 

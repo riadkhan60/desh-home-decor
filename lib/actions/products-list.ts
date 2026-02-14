@@ -1,5 +1,6 @@
 "use server";
 
+import { unstable_cache } from "next/cache";
 import { prisma } from "../prisma";
 
 export interface ProductFilters {
@@ -109,6 +110,13 @@ export async function getProducts(filters: ProductFilters = {}) {
   };
 }
 
+// Cached default products for homepage (no filters)
+export const getProductsCached = unstable_cache(
+  async () => getProducts({ take: 20 }),
+  ["products-home"],
+  { revalidate: 60, tags: ['products'] },
+);
+
 export async function getAllCategories() {
   const categories = await prisma.category.findMany({
     where: {
@@ -135,3 +143,10 @@ export async function getAllCategories() {
 
   return categories;
 }
+
+// Cached for homepage
+export const getAllCategoriesCached = unstable_cache(
+  async () => getAllCategories(),
+  ["categories-home"],
+  { revalidate: 3600, tags: ['categories'] },
+);

@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '../prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { unstable_cache } from 'next/cache';
 
 // Public function for showcase reviews - cached for performance
@@ -38,9 +38,7 @@ export const getShowcaseReviews = unstable_cache(
     return reviews;
   },
   ['showcase-reviews'],
-  {
-    revalidate: 3600, // Cache for 1 hour
-  },
+  { revalidate: 3600, tags: ['reviews'] },
 );
 
 // Admin: Get all reviews with optional search
@@ -115,7 +113,8 @@ export async function createReview(data: {
     });
 
     revalidatePath('/admin/reviews');
-    revalidatePath('/'); // Revalidate home as it may show reviews
+    revalidatePath('/');
+    revalidateTag('reviews');
     return { success: true, data: review };
   } catch (error) {
     console.error('Error creating review:', error);
@@ -163,6 +162,7 @@ export async function updateReview(
 
     revalidatePath('/admin/reviews');
     revalidatePath('/');
+    revalidateTag('reviews');
     return { success: true, data: review };
   } catch (error) {
     console.error('Error updating review:', error);
@@ -179,6 +179,7 @@ export async function deleteReview(id: string) {
 
     revalidatePath('/admin/reviews');
     revalidatePath('/');
+    revalidateTag('reviews');
     return { success: true };
   } catch (error) {
     console.error('Error deleting review:', error);
@@ -196,6 +197,7 @@ export async function toggleReviewApproval(id: string, isApproved: boolean) {
 
     revalidatePath('/admin/reviews');
     revalidatePath('/');
+    revalidateTag('reviews');
     return { success: true };
   } catch (error) {
     console.error('Error toggling review approval:', error);

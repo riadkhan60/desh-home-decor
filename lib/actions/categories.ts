@@ -1,8 +1,20 @@
 'use server';
 
+import { unstable_cache, revalidatePath, revalidateTag } from 'next/cache';
 import { prisma } from '../prisma';
-import { revalidatePath } from 'next/cache';
 
+// Cached for homepage - avoids refetch when navigating back
+export const getHomeCategoriesCached = unstable_cache(
+  async () => {
+    return prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      take: 6,
+    });
+  },
+  ['home-categories'],
+  { revalidate: 3600, tags: ['categories'] },
+);
 
 export async function getHomeCategories(take: number = 6) {
   const categories = await prisma.category.findMany({
@@ -66,7 +78,8 @@ export async function createCategory(data: {
     });
 
     revalidatePath('/admin/categories');
-    revalidatePath('/'); // Revalidate home as it shows categories
+    revalidatePath('/');
+    revalidateTag('categories');
     return { success: true, data: category };
   } catch (error) {
     console.error('Error creating category:', error);
@@ -103,6 +116,7 @@ export async function updateCategory(
 
     revalidatePath('/admin/categories');
     revalidatePath('/');
+    revalidateTag('categories');
     return { success: true, data: category };
   } catch (error) {
     console.error('Error updating category:', error);
@@ -118,6 +132,7 @@ export async function deleteCategory(id: string) {
 
     revalidatePath('/admin/categories');
     revalidatePath('/');
+    revalidateTag('categories');
     return { success: true };
   } catch (error) {
     console.error('Error deleting category:', error);
@@ -134,6 +149,7 @@ export async function toggleCategoryStatus(id: string, isActive: boolean) {
 
     revalidatePath('/admin/categories');
     revalidatePath('/');
+    revalidateTag('categories');
     return { success: true };
   } catch (error) {
     console.error('Error toggling category status:', error);

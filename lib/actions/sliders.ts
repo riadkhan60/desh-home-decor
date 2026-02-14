@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '../prisma';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { unstable_cache } from 'next/cache';
 
 export async function getSliders() {
@@ -66,6 +66,7 @@ export async function createSlider(data: {
     // Revalidate paths to update cached data
     revalidatePath('/admin/sliders');
     revalidatePath('/');
+    revalidateTag('sliders');
     return { success: true, data: slider };
   } catch (error) {
     console.error('Error creating slider:', error);
@@ -92,9 +93,9 @@ export async function updateSlider(
       data,
     });
 
-    // Revalidate paths to update cached data
     revalidatePath('/admin/sliders');
     revalidatePath('/');
+    revalidateTag('sliders');
     return { success: true, data: slider };
   } catch (error) {
     console.error('Error updating slider:', error);
@@ -108,9 +109,9 @@ export async function deleteSlider(id: string) {
       where: { id },
     });
 
-    // Revalidate paths to update cached data
     revalidatePath('/admin/sliders');
     revalidatePath('/');
+    revalidateTag('sliders');
     return { success: true };
   } catch (error) {
     console.error('Error deleting slider:', error);

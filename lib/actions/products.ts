@@ -1,7 +1,8 @@
 "use server";
 
+import { unstable_cache } from "next/cache";
 import { prisma } from "../prisma";
-import { getCollections } from "./collections";
+import { getCollectionsCached } from "./collections";
 
 // collectionSlug matches Collection.slug
 export async function getProductsByCollection(
@@ -39,26 +40,47 @@ export async function getProductsByCollection(
   return products;
 }
 
-// Dynamic collections from database - fetches first 3 collections with products
+// Cached for homepage - avoids refetch when navigating back
+export const getHomeCollectionProductsCached = unstable_cache(
+  async () => {
+    const collectionsRes = await getCollectionsCached();
+    if (!collectionsRes.success || !collectionsRes.data?.length) {
+      return { collections: [] };
+    }
+
+    const collections = collectionsRes.data.slice(0, 6);
+
+    const collectionsWithProducts = await Promise.all(
+      collections.map(async (c) => {
+        const products = await getProductsByCollection(c.slug, { take: 8 });
+        return {
+          slug: c.slug,
+          name: c.name,
+          products,
+        };
+      })
+    );
+
+    return { collections: collectionsWithProducts };
+  },
+  ["home-collection-products"],
+  { revalidate: 300, tags: ['products', 'collections'] },
+);
+
+// Non-cached version for admin/other use
 export async function getHomeCollectionProducts() {
+  const { getCollections } = await import("./collections");
   const collectionsRes = await getCollections();
   if (!collectionsRes.success || !collectionsRes.data?.length) {
     return { collections: [] };
   }
-
-  const collections = collectionsRes.data.slice(0, 6); // up to 6 collections for tabs
-
+  const collections = collectionsRes.data.slice(0, 6);
   const collectionsWithProducts = await Promise.all(
     collections.map(async (c) => {
       const products = await getProductsByCollection(c.slug, { take: 8 });
-      return {
-        slug: c.slug,
-        name: c.name,
-        products,
-      };
+      return { slug: c.slug, name: c.name, products };
     })
   );
-
   return { collections: collectionsWithProducts };
 }
 
