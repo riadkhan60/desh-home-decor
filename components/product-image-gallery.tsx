@@ -34,6 +34,7 @@ export function ProductImageGallery({
             fill
             className="object-cover"
             sizes="(min-width: 1024px) 50vw, 100vw"
+            priority={selectedIndex === 0}
           />
         </button>
 

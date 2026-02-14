@@ -27,17 +27,17 @@ export async function generateMetadata(
 
   if (!product) {
     return {
-      title: 'Product Not Found | Shilpini',
+      title: 'Product Not Found | Deshi Home Decor',
     };
   }
 
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: `${product.name} | Shilpini`,
+    title: `${product.name} | Deshi Home Decor`,
     description:
       product.description?.slice(0, 160) ||
-      `Buy ${product.name} at Shilpini. Authentic Punjabi ethnic wear.`,
+      `Buy ${product.name} at Deshi Home Decor. Premium home decor and lighting.`,
     openGraph: {
       title: product.name,
       description: product.description?.slice(0, 160),
@@ -116,11 +116,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     sku: product.id,
     brand: {
       '@type': 'Brand',
-      name: 'Shilpini',
+      name: 'Deshi Home Decor',
     },
     offers: {
       '@type': 'Offer',
-      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://shilpini.com'}/product/${product.id}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/product/${product.id}`,
       priceCurrency: 'BDT',
       price: basePrice ?? minVariantPrice ?? 0,
       itemCondition: 'https://schema.org/NewCondition',
@@ -130,7 +130,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'Organization',
-        name: 'Shilpini',
+        name: 'Deshi Home Decor',
       },
     },
     aggregateRating:

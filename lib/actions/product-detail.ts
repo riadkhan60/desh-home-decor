@@ -1,8 +1,9 @@
 'use server';
 
+import { cache } from 'react';
 import { prisma } from '../prisma';
 
-export async function getProductById(id: string) {
+export const getProductById = cache(async (id: string) => {
   const product = await prisma.product.findUnique({
     where: { id },
     include: {
@@ -13,7 +14,7 @@ export async function getProductById(id: string) {
   });
 
   return product;
-}
+});
 
 export async function getProductReviews(productId: string) {
   const reviews = await prisma.review.findMany({
