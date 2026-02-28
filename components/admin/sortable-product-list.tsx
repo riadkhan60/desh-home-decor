@@ -189,21 +189,8 @@ export function SortableProductList({ initialProducts }: Props) {
       </SortableContext>
 
       {/* Drag Overlay: renders a floating "ghost" copy while dragging */}
-      <DragOverlay dropAnimation={{ duration: 150, easing: 'ease' }}>
-        {activeProduct ? (
-          <>
-            {/* Desktop overlay */}
-            <table className="hidden w-full rounded-xl border bg-card shadow-2xl md:table">
-              <tbody>
-                <OverlayTableRow product={activeProduct} />
-              </tbody>
-            </table>
-            {/* Mobile overlay */}
-            <div className="md:hidden">
-              <OverlayCard product={activeProduct} />
-            </div>
-          </>
-        ) : null}
+      <DragOverlay dropAnimation={{ duration: 120, easing: 'ease' }}>
+        {activeProduct ? <OverlayCard product={activeProduct} /> : null}
       </DragOverlay>
     </DndContext>
   );
@@ -218,26 +205,23 @@ function SortableTableRow({
   product: Product;
   isBeingDragged: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: product.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition ?? 'transform 200ms ease',
-  };
+  // NOTE: CSS transforms do NOT work on <tr> elements because they participate
+  // in the table layout algorithm. So we omit transform/transition here and
+  // let the DragOverlay handle all visual movement. The source row just fades.
+  const { attributes, listeners, setNodeRef } = useSortable({ id: product.id });
 
   return (
     <tr
       ref={setNodeRef}
-      style={style}
-      className={`transition-colors ${
-        isBeingDragged ? 'opacity-40' : 'hover:bg-muted/30'
+      className={`transition-opacity ${
+        isBeingDragged ? 'opacity-30 bg-muted/20' : 'hover:bg-muted/30'
       }`}
     >
       <td className="px-4 py-4 text-center align-middle">
         <button
           className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
           aria-label="Drag to reorder"
+          style={{ touchAction: 'none' }}
           {...attributes}
           {...listeners}
         >
@@ -279,6 +263,7 @@ function SortableCard({
           <button
             className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
             aria-label="Drag to reorder"
+            style={{ touchAction: 'none' }}
             {...attributes}
             {...listeners}
           >
@@ -295,19 +280,6 @@ function SortableCard({
         Edit Product
       </Link>
     </div>
-  );
-}
-
-// ─── Overlay Rows (no drag handles, no refs) ──────────────────────────────────
-
-function OverlayTableRow({ product }: { product: Product }) {
-  return (
-    <tr className="bg-card shadow-lg ring-1 ring-primary/20 rounded-xl">
-      <td className="px-4 py-4 text-center align-middle text-muted-foreground">
-        <GripVertical className="h-5 w-5 mx-auto" />
-      </td>
-      <ProductTableCells product={product} />
-    </tr>
   );
 }
 
