@@ -1,14 +1,14 @@
-"use server";
+'use server';
 
-import { unstable_cache } from "next/cache";
-import { prisma } from "../prisma";
+import { unstable_cache } from 'next/cache';
+import { prisma } from '../prisma';
 
 export interface ProductFilters {
   categoryId?: string;
   // Collection slug matching Collection.slug (e.g. "NEW_ARRIVAL")
   collection?: string;
   search?: string;
-  sortBy?: "newest" | "oldest" | "price-asc" | "price-desc";
+  sortBy?: 'default' | 'newest' | 'oldest' | 'price-asc' | 'price-desc';
   skip?: number;
   take?: number;
 }
@@ -18,7 +18,7 @@ export async function getProducts(filters: ProductFilters = {}) {
     categoryId,
     collection,
     search,
-    sortBy = "newest",
+    sortBy = 'default',
     skip = 0,
     take = 20,
   } = filters;
@@ -34,7 +34,7 @@ export async function getProducts(filters: ProductFilters = {}) {
         };
       };
     };
-    OR?: Array<{ name: { contains: string; mode: "insensitive" } }>;
+    OR?: Array<{ name: { contains: string; mode: 'insensitive' } }>;
   } = {
     isActive: true,
   };
@@ -54,30 +54,35 @@ export async function getProducts(filters: ProductFilters = {}) {
   }
 
   if (search) {
-    where.OR = [
-      { name: { contains: search, mode: "insensitive" } },
-    ];
+    where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
   }
 
-  // Build orderBy clause
+  // Build orderBy clause. Uses an array so we can have a secondary sort key.
   let orderBy:
-    | { createdAt: "asc" | "desc" }
-    | { price: "asc" | "desc" } = { createdAt: "desc" };
+    | { order: 'asc' }[]
+    | { createdAt: 'asc' | 'desc' }[]
+    | { price: 'asc' | 'desc' }[] = [{ order: 'asc' }];
+
   switch (sortBy) {
-    case "newest":
-      orderBy = { createdAt: "desc" };
+    case 'default':
+      // Manual drag order, newest as tiebreaker
+      orderBy = [{ order: 'asc' }];
       break;
-    case "oldest":
-      orderBy = { createdAt: "asc" };
+    case 'newest':
+      orderBy = [{ createdAt: 'desc' }];
       break;
-    case "price-asc":
-      orderBy = { price: "asc" };
+    case 'oldest':
+      orderBy = [{ createdAt: 'asc' }];
       break;
-    case "price-desc":
-      orderBy = { price: "desc" };
+    case 'price-asc':
+      orderBy = [{ price: 'asc' }];
+      break;
+    case 'price-desc':
+      orderBy = [{ price: 'desc' }];
       break;
     default:
-      orderBy = { createdAt: "desc" };
+      // No filter selected — respect manual ordering
+      orderBy = [{ order: 'asc' }];
   }
 
   const [products, total] = await Promise.all([
@@ -113,7 +118,7 @@ export async function getProducts(filters: ProductFilters = {}) {
 // Cached default products for homepage (no filters)
 export const getProductsCached = unstable_cache(
   async () => getProducts({ take: 20 }),
-  ["products-home"],
+  ['products-home'],
   { revalidate: 60, tags: ['products'] },
 );
 
@@ -123,7 +128,7 @@ export async function getAllCategories() {
       isActive: true,
     },
     orderBy: {
-      order: "asc",
+      order: 'asc',
     },
     select: {
       id: true,
@@ -147,6 +152,6 @@ export async function getAllCategories() {
 // Cached for homepage
 export const getAllCategoriesCached = unstable_cache(
   async () => getAllCategories(),
-  ["categories-home"],
+  ['categories-home'],
   { revalidate: 3600, tags: ['categories'] },
 );

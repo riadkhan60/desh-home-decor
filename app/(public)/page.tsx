@@ -6,7 +6,11 @@ import HomeShowcaseReviewsSection from '@/components/home-showcase-reviews-secti
 import HomeCategoriesSection from '@/components/home-categories-section';
 import HomeCollectionsSection from '@/components/home-collections-section';
 import { getHeroSlides } from '@/lib/actions/sliders';
-import { getProducts, getProductsCached, getAllCategoriesCached } from '@/lib/actions/products-list';
+import {
+  getProducts,
+  getProductsCached,
+  getAllCategoriesCached,
+} from '@/lib/actions/products-list';
 import { getCollectionsCached } from '@/lib/actions/collections';
 import { getHomeCollectionProductsCached } from '@/lib/actions/products';
 import { getHomeCategoriesCached } from '@/lib/actions/categories';
@@ -20,7 +24,7 @@ interface HomePageProps {
     category?: string;
     collection?: string;
     search?: string;
-    sort?: 'newest' | 'oldest' | 'price-asc' | 'price-desc';
+    sort?: 'default' | 'newest' | 'oldest' | 'price-asc' | 'price-desc';
     skip?: string;
   }>;
 }
@@ -29,29 +33,41 @@ export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const { category, collection, search, sort, skip } = params;
 
-  const hasFilters = !!(category || collection || search || (skip && parseInt(skip) > 0));
-  const sortBy = sort || 'newest';
+  const hasFilters = !!(
+    category ||
+    collection ||
+    search ||
+    (skip && parseInt(skip) > 0)
+  );
+  const sortBy = sort || 'default';
   const skipNum = skip ? parseInt(skip) : 0;
 
-  const [slides, productsData, collectionsRes, categories, homeCollectionsData, homeCategories, showcaseReviews] =
-    await Promise.all([
-      getHeroSlides(),
-      hasFilters
-        ? getProducts({
-            categoryId: category,
-            collection,
-            search,
-            sortBy,
-            skip: skipNum,
-            take: 20,
-          })
-        : getProductsCached(),
-      getCollectionsCached(),
-      getAllCategoriesCached(),
-      getHomeCollectionProductsCached(),
-      getHomeCategoriesCached(),
-      getShowcaseReviews(10),
-    ]);
+  const [
+    slides,
+    productsData,
+    collectionsRes,
+    categories,
+    homeCollectionsData,
+    homeCategories,
+    showcaseReviews,
+  ] = await Promise.all([
+    getHeroSlides(),
+    hasFilters
+      ? getProducts({
+          categoryId: category,
+          collection,
+          search,
+          sortBy,
+          skip: skipNum,
+          take: 20,
+        })
+      : getProductsCached(),
+    getCollectionsCached(),
+    getAllCategoriesCached(),
+    getHomeCollectionProductsCached(),
+    getHomeCategoriesCached(),
+    getShowcaseReviews(10),
+  ]);
 
   const collections = collectionsRes.success ? collectionsRes.data : [];
 
@@ -144,7 +160,9 @@ export default async function Home({ searchParams }: HomePageProps) {
       </section>
 
       {/* Home Collections Section */}
-      <HomeCollectionsSection collectionsWithProducts={homeCollectionsData.collections ?? []} />
+      <HomeCollectionsSection
+        collectionsWithProducts={homeCollectionsData.collections ?? []}
+      />
 
       {/* Home Categories Section */}
       <HomeCategoriesSection categories={homeCategories ?? []} />
