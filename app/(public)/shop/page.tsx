@@ -1,20 +1,29 @@
-import { Container } from "@/components/container";
-import { ProductsGrid } from "@/components/products-grid";
-import { ProductSearch } from "@/components/product-search";
-import { ShopFilterBar } from "@/components/shop-filter-bar";
-import { getProducts, getAllCategories } from "@/lib/actions/products-list";
-import { getCollections } from "@/lib/actions/collections";
+import { Container } from '@/components/container';
+import { ProductsGrid } from '@/components/products-grid';
+import { ProductSearch } from '@/components/product-search';
+import { ShopFilterBar } from '@/components/shop-filter-bar';
+import { getProducts, getAllCategories } from '@/lib/actions/products-list';
+import { getCollections } from '@/lib/actions/collections';
 
 export const revalidate = 3600;
 
 export const metadata = {
-  title: 'Shop - Deshi Home Decor',
+  title: 'Shop | Premium Handcrafted Home Decor in Bangladesh',
   description:
-    'Browse our full collection of bamboo, rattan, seagrass, jute home decor and premium imported lighting. Handcrafted pieces for your space.',
+    'Browse our full collection of bamboo, rattan, seagrass, jute home decor and premium imported lighting. Shop handcrafted pieces for your space at Deshi Home Decor.',
+  keywords:
+    'shop home decor, bamboo decor, rattan furniture, imported lighting, Deshi Home Decor, buy decor online, Bangladesh home styling',
   openGraph: {
-    title: 'Shop | Deshi Home Decor',
-    description: 'Browse premium home decor and lighting – bamboo, rattan, seagrass, jute.',
-    url: '/shop',
+    title: 'Shop All Products | Deshi Home Decor',
+    description:
+      'Browse premium home decor and lighting. Discover the beauty of handcrafted bamboo, rattan, seagrass, and jute items.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/shop`,
+    siteName: 'Deshi Home Decor',
+    locale: 'en_US',
+    type: 'website',
+  },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/shop`,
   },
 };
 
@@ -23,7 +32,7 @@ type ShopPageProps = {
     category?: string;
     collection?: string;
     search?: string;
-    sort?: "newest" | "oldest" | "price-asc" | "price-desc";
+    sort?: 'newest' | 'oldest' | 'price-asc' | 'price-desc';
     skip?: string;
   }>;
 };
@@ -76,6 +85,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     return {
       id: p.id,
       name: p.name,
+      slug: p.slug || undefined,
       price,
       comparePrice: hasMultipleVariants ? null : comparePrice,
       priceMin: hasMultipleVariants ? priceMin : null,
@@ -108,7 +118,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <div className="mb-6 rounded-2xl border bg-card p-4">
           <ShopFilterBar
             categories={categories}
-            collections={collections?.map((c) => ({ value: c.slug, label: c.name })) ?? []}
+            collections={
+              collections?.map((c) => ({ value: c.slug, label: c.name })) ?? []
+            }
           />
         </div>
 

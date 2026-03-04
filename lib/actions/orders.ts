@@ -43,14 +43,14 @@ export async function createOrder(data: CreateOrderInput) {
       return { success: false, error: 'Cart is empty' };
     }
 
-    // Generate sequential order number (SHILP-1001, SHILP-1002, etc.)
+    // Generate sequential order number (DHD1001, DHD1002, etc.)
     const counter = await prisma.counter.upsert({
       where: { name: 'order_number' },
       update: { count: { increment: 1 } },
       create: { name: 'order_number', count: 1001 },
     });
 
-    const orderNumber = `SHILP${counter.count}`;
+    const orderNumber = `DHD${counter.count}`;
 
     const order = await prisma.order.create({
       data: {

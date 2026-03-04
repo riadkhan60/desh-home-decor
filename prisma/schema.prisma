@@ -51,6 +51,7 @@ model Category {
 model Product {
   id          String   @id @default(cuid())
   name        String
+  slug        String  @unique
   description String?  @db.Text
   price       Decimal? @db.Decimal(10, 2)
   comparePrice Decimal? @db.Decimal(10, 2) // Original price for discounts

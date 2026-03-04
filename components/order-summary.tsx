@@ -31,20 +31,22 @@ export function OrderSummary({ shippingCost = 0 }: OrderSummaryProps) {
       <div className="mb-8 space-y-6">
         {items.map((item) => (
           <div key={item.cartItemId} className="flex gap-4 items-start">
-            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border-0 bg-background shadow-sm">
-              {item.featuredImage ? (
-                <Image
-                  src={item.featuredImage}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs text-muted-foreground/50 bg-muted/50">
-                  No img
-                </div>
-              )}
-              <div className="absolute top-0 right-0 flex h-6 w-6 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background shadow-sm ring-2 ring-background z-10">
+            <div className="relative h-20 w-20 shrink-0 border-0 bg-background shadow-sm rounded-lg">
+              <div className="relative h-full w-full overflow-hidden rounded-lg">
+                {item.featuredImage ? (
+                  <Image
+                    src={item.featuredImage}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs text-muted-foreground/50 bg-muted/50">
+                    No img
+                  </div>
+                )}
+              </div>
+              <div className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background shadow-sm ring-2 ring-background z-10">
                 {item.quantity}
               </div>
             </div>

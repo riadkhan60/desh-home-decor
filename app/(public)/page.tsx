@@ -19,6 +19,26 @@ import { getShowcaseReviews } from '@/lib/actions/reviews';
 // Revalidate this page every 1 hour (ISR)
 export const revalidate = 3600;
 
+export const metadata = {
+  title: 'Deshi Home Decor | Premium Handcrafted Home & Lighting',
+  description:
+    'Discover Deshi Home Decor, the premier destination for authentic, handcrafted home decor in Bangladesh. Buy beautiful bamboo, rattan, jute, and lighting online.',
+  keywords:
+    'deshi home decor, buy decor online bd, home decor bangladesh, bamboo decor, rattan furniture, imported lighting, living room styling',
+  openGraph: {
+    title: 'Deshi Home Decor | Premium Home Styling',
+    description:
+      'Discover exquisite home decor pieces crafted to add warm, luxurious ambiance to your space. Shop bamboo, rattan, and seagrass online.',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com',
+    siteName: 'Deshi Home Decor',
+    locale: 'en_US',
+    type: 'website',
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com',
+  },
+};
+
 interface HomePageProps {
   searchParams: Promise<{
     category?: string;
@@ -101,6 +121,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     return {
       id: p.id,
       name: p.name,
+      slug: p.slug || undefined,
       price,
       comparePrice: hasMultipleVariants ? null : comparePrice,
       priceMin: hasMultipleVariants ? priceMin : null,

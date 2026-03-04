@@ -11,6 +11,7 @@ import { OrderNowButton } from '@/components/order-now-button';
 interface Product {
   id: string;
   name: string;
+  slug?: string;
   price: string;
   comparePrice: string | null;
   priceMin?: string | null;
@@ -179,7 +180,7 @@ export function ProductsGrid({
         {products.map((product) => (
           <Link
             key={product.id}
-            href={`/product/${product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-700 bg-linear-to-br from-zinc-900 to-black transition-all duration-700 ease-out hover:-translate-y-0.5 hover:border-zinc-600"
           >
             {/* Animated Gold Border */}

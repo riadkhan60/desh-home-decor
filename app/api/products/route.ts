@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
       return {
         id: p.id,
         name: p.name,
+        slug: p.slug,
         price,
         comparePrice: hasMultipleVariants ? null : comparePrice,
         priceMin: hasMultipleVariants ? priceMin : null,

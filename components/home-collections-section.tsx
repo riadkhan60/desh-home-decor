@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HomeCollectionsTabs } from "@/components/home-collections-tabs";
+import { HomeCollectionsTabs } from '@/components/home-collections-tabs';
 
 export type ProductCard = {
   id: string;
   name: string;
+  slug?: string;
   featuredImage: string | null;
   price: string;
   priceMin?: string | null;
@@ -11,7 +12,6 @@ export type ProductCard = {
   hasMultipleVariants?: boolean;
   categoryName: string | null;
 };
-
 
 function mapProducts(items: any[]): ProductCard[] {
   return items.map((p) => {
@@ -23,7 +23,7 @@ function mapProducts(items: any[]): ProductCard[] {
     let priceMax: string | null = null;
 
     if (hasMultipleVariants) {
-      const prices = variants.map((v: { price: any; }) => Number(v.price));
+      const prices = variants.map((v: { price: any }) => Number(v.price));
       priceMin = Math.min(...prices).toString();
       priceMax = Math.max(...prices).toString();
       price = priceMin;
@@ -36,6 +36,7 @@ function mapProducts(items: any[]): ProductCard[] {
     return {
       id: p.id,
       name: p.name,
+      slug: p.slug || undefined,
       featuredImage: p.featuredImage,
       price,
       priceMin: hasMultipleVariants ? priceMin : null,
@@ -67,8 +68,5 @@ export default function HomeCollectionsSection({
     products: mapProducts(c.products ?? []),
   }));
 
-  return (
-    <HomeCollectionsTabs collections={collectionsWithMappedProducts} />
-  );
+  return <HomeCollectionsTabs collections={collectionsWithMappedProducts} />;
 }
-

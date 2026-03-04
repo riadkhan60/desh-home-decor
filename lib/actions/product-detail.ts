@@ -3,15 +3,38 @@
 import { cache } from 'react';
 import { prisma } from '../prisma';
 
-export const getProductById = cache(async (id: string) => {
-  const product = await prisma.product.findUnique({
-    where: { id },
+export const getProductBySlug = cache(async (slug: string) => {
+  let product = await prisma.product.findUnique({
+    where: { slug: slug },
     include: {
       category: true,
       options: true,
       variants: true,
+      collections: {
+        include: {
+          collection: true,
+        },
+      },
     },
   });
+
+  // Fallback for older links or cases where slug hasn't fully propagated, if needed
+  // Check if what looks like a slug is actually an ID
+  if (!product && slug.length >= 25 && !slug.includes('-')) {
+    product = await prisma.product.findUnique({
+      where: { id: slug },
+      include: {
+        category: true,
+        options: true,
+        variants: true,
+        collections: {
+          include: {
+            collection: true,
+          },
+        },
+      },
+    });
+  }
 
   return product;
 });

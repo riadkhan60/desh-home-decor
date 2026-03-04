@@ -5,19 +5,26 @@ import { Container } from '@/components/container';
 import { Leaf, Heart, Users, Package, Sparkles, Globe } from 'lucide-react';
 
 export const metadata = {
-  title: 'About Us - Deshi Home Decor',
+  title: 'About Us | Premium Eco-Friendly Home Decor Bangladesh',
   description:
-    'Learn about Deshi Home Decor - your trusted source for eco-friendly bamboo, rattan, seagrass, jute, and premium imported home decor items.',
+    'Discover the story behind Deshi Home Decor. We source authentic, eco-friendly bamboo, rattan, seagrass, jute, and premium imported home decor items to elevate your living space.',
+  keywords: 'about deshi home decor, eco-friendly decor bangladesh, sustainable home styling, bamboo craftsmanship, rattan village artisans, premium imported decor',
   openGraph: {
-    title: 'About Us | Deshi Home Decor',
-    description: 'Eco-friendly bamboo, rattan, seagrass & jute home decor. Supporting local artisans.',
-    url: '/about',
+    title: 'Our Story | Deshi Home Decor',
+    description: 'Learn about our mission to bring sustainable, eco-friendly bamboo, rattan, seagrass & jute home decor into your life. Supporting local artisans and premium design.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/about`,
+    siteName: 'Deshi Home Decor',
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About Us | Deshi Home Decor',
-    description: 'Eco-friendly bamboo, rattan, seagrass & jute home decor.',
+    title: 'Our Story | Deshi Home Decor',
+    description: 'Learn about our mission to bring sustainable, eco-friendly bamboo, rattan, seagrass & jute home decor into your life.',
   },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/about`,
+  }
 };
 
 export default function AboutPage() {

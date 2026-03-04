@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { BanglaText } from "@/components/bangla-text";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { Container } from "@/components/container";
-import type { ProductCard } from "./home-collections-section";
+import Image from 'next/image';
+import Link from 'next/link';
+import { BanglaText } from '@/components/bangla-text';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Container } from '@/components/container';
+import type { ProductCard } from './home-collections-section';
 
 function formatPrice(value: string) {
   const num = Number(value);
   if (Number.isNaN(num)) return value;
-  return `TK ${num.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  return `TK ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 }
 
 function ProductPrice({ product }: { product: ProductCard }) {
@@ -29,7 +29,13 @@ function ProductPrice({ product }: { product: ProductCard }) {
   );
 }
 
-function ProductsGrid({ products, collectionSlug }: { products: ProductCard[]; collectionSlug: string }) {
+function ProductsGrid({
+  products,
+  collectionSlug,
+}: {
+  products: ProductCard[];
+  collectionSlug: string;
+}) {
   if (!products.length) {
     return (
       <p className="py-8 text-sm text-muted-foreground">
@@ -45,7 +51,7 @@ function ProductsGrid({ products, collectionSlug }: { products: ProductCard[]; c
         {products.map((product) => (
           <Link
             key={product.id}
-            href={`/product/${product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="group snap-start flex w-64 shrink-0 flex-col overflow-hidden rounded-xl border bg-card transition hover:shadow-md"
           >
             <div className="relative aspect-3/4 overflow-hidden bg-muted">
@@ -69,7 +75,10 @@ function ProductsGrid({ products, collectionSlug }: { products: ProductCard[]; c
                   {product.categoryName}
                 </span>
               )}
-              <BanglaText as="span" className="line-clamp-2 text-sm font-medium">
+              <BanglaText
+                as="span"
+                className="line-clamp-2 text-sm font-medium"
+              >
                 {product.name}
               </BanglaText>
               <ProductPrice product={product} />
@@ -100,7 +109,7 @@ function ProductsGrid({ products, collectionSlug }: { products: ProductCard[]; c
           {products.map((product) => (
             <Link
               key={product.id}
-              href={`/product/${product.id}`}
+              href={`/product/${product.slug || product.id}`}
               className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:shadow-md"
             >
               <div className="relative aspect-3/4 overflow-hidden bg-muted">
@@ -124,7 +133,10 @@ function ProductsGrid({ products, collectionSlug }: { products: ProductCard[]; c
                     {product.categoryName}
                   </span>
                 )}
-                <BanglaText as="span" className="line-clamp-2 text-sm font-medium">
+                <BanglaText
+                  as="span"
+                  className="line-clamp-2 text-sm font-medium"
+                >
                   {product.name}
                 </BanglaText>
                 <ProductPrice product={product} />
@@ -173,8 +185,8 @@ export function HomeCollectionsTabs({ collections }: HomeCollectionsTabsProps) {
                   onClick={() => setActiveIndex(idx)}
                   className={`relative rounded-full px-3 py-1 transition ${
                     isActive
-                      ? "bg-foreground text-background"
-                      : "border text-foreground/80 hover:text-foreground"
+                      ? 'bg-foreground text-background'
+                      : 'border text-foreground/80 hover:text-foreground'
                   }`}
                 >
                   {col.name}
@@ -215,4 +227,3 @@ export function HomeCollectionsTabs({ collections }: HomeCollectionsTabsProps) {
     </section>
   );
 }
-

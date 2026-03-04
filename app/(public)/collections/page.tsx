@@ -10,13 +10,22 @@ import { OrderNowButton } from '@/components/order-now-button';
 export const revalidate = 3600;
 
 export const metadata = {
-  title: 'Collections - Deshi Home Decor',
+  title: 'Our Collections | Buy Premium Home Decor in Bangladesh',
   description:
-    'Explore our curated collections of home decor – new arrivals, best sellers, and themed sets. Bamboo, rattan, seagrass & more.',
+    'Explore our curated collections of Deshi Home Decor – new arrivals, best sellers, and themed sets. Buy authentic bamboo, rattan, and seagrass decor online.',
+  keywords:
+    'home decor collections, bamboo decor, rattan furniture, imported lighting, Deshi Home Decor, curated living room decor, Bangladesh home styling',
   openGraph: {
-    title: 'Collections | Deshi Home Decor',
-    description: 'Explore curated home decor collections – new arrivals, best sellers, themed sets.',
-    url: '/collections',
+    title: 'Curated Home Decor Collections | Deshi Home Decor',
+    description:
+      'Explore curated home decor collections – new arrivals, best sellers, themed sets. Elevate your space with our premium selection.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/collections`,
+    siteName: 'Deshi Home Decor',
+    locale: 'en_US',
+    type: 'website',
+  },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/collections`,
   },
 };
 
@@ -42,9 +51,15 @@ function mapProduct(p: any) {
     priceMin = Math.min(...prices).toString();
     priceMax = Math.max(...prices).toString();
     price = priceMin;
-    stock = variants.reduce((s: number, v: { stock?: number }) => s + (v.stock ?? 0), 0);
+    stock = variants.reduce(
+      (s: number, v: { stock?: number }) => s + (v.stock ?? 0),
+      0,
+    );
   } else if (hasVariants) {
-    stock = variants.reduce((s: number, v: { stock?: number }) => s + (v.stock ?? 0), 0);
+    stock = variants.reduce(
+      (s: number, v: { stock?: number }) => s + (v.stock ?? 0),
+      0,
+    );
     price = (p.price ?? variants[0]?.price ?? 0).toString();
     comparePrice = p.comparePrice?.toString() ?? null;
   } else {
@@ -56,6 +71,7 @@ function mapProduct(p: any) {
   return {
     id: p.id,
     name: p.name,
+    slug: p.slug || undefined,
     price,
     comparePrice: hasMultipleVariants ? null : comparePrice,
     priceMin: hasMultipleVariants ? priceMin : null,
@@ -70,9 +86,9 @@ function mapProduct(p: any) {
 
 export default async function CollectionsPage() {
   const collectionsRes = await getCollections();
-  const collectionsData = (collectionsRes.success ? collectionsRes.data ?? [] : []).filter(
-    (c) => c.isActive !== false
-  );
+  const collectionsData = (
+    collectionsRes.success ? (collectionsRes.data ?? []) : []
+  ).filter((c) => c.isActive !== false);
 
   const collections = await Promise.all(
     collectionsData.map(async (c) => {
@@ -87,7 +103,7 @@ export default async function CollectionsPage() {
         products: products.map(mapProduct),
         total,
       };
-    })
+    }),
   );
 
   return (
@@ -133,7 +149,7 @@ export default async function CollectionsPage() {
                       {collection.products.map((product) => (
                         <Link
                           key={product.id}
-                          href={`/product/${product.id}`}
+                          href={`/product/${product.slug || product.id}`}
                           className="group flex flex-col overflow-hidden rounded-2xl border bg-card transition hover:shadow-lg"
                         >
                           <div className="relative aspect-square overflow-hidden bg-muted">
@@ -160,7 +176,10 @@ export default async function CollectionsPage() {
                           </div>
 
                           <div className="flex flex-1 flex-col gap-1 p-3 sm:gap-2 sm:p-4">
-                            <BanglaText as="h3" className="line-clamp-2 text-sm font-medium leading-tight sm:text-base">
+                            <BanglaText
+                              as="h3"
+                              className="line-clamp-2 text-sm font-medium leading-tight sm:text-base"
+                            >
                               {product.name}
                             </BanglaText>
 
@@ -169,7 +188,8 @@ export default async function CollectionsPage() {
                               product.priceMin != null &&
                               product.priceMax != null ? (
                                 <span className="text-base font-semibold sm:text-lg">
-                                  {formatPrice(product.priceMin)} – {formatPrice(product.priceMax)}
+                                  {formatPrice(product.priceMin)} –{' '}
+                                  {formatPrice(product.priceMax)}
                                 </span>
                               ) : (
                                 <>
@@ -177,7 +197,8 @@ export default async function CollectionsPage() {
                                     {formatPrice(product.price)}
                                   </span>
                                   {product.comparePrice &&
-                                    Number(product.comparePrice) > Number(product.price) && (
+                                    Number(product.comparePrice) >
+                                      Number(product.price) && (
                                       <span className="text-xs text-muted-foreground line-through sm:text-sm">
                                         {formatPrice(product.comparePrice)}
                                       </span>
@@ -235,7 +256,7 @@ export default async function CollectionsPage() {
                 )}
               </section>
             ))}
-            </div>
+          </div>
         )}
       </Container>
     </main>

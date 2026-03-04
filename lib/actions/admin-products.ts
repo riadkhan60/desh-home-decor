@@ -9,6 +9,7 @@ export interface ProductFormData {
   price?: string;
   comparePrice?: string;
   sku?: string;
+  slug: string;
   stock?: number;
   weight?: string;
   categoryId?: string;
@@ -46,6 +47,7 @@ export async function createProduct(data: ProductFormData) {
         data.price && data.price.toString().trim() !== '' ? data.price : null,
       comparePrice: data.comparePrice || null,
       sku: data.sku || null,
+      slug: data.slug,
       stock: typeof data.stock === 'number' ? data.stock : undefined,
       weight:
         data.weight && data.weight.toString().trim() !== ''
@@ -110,6 +112,7 @@ export async function updateProduct(id: string, data: ProductFormData) {
         data.price && data.price.toString().trim() !== '' ? data.price : null,
       comparePrice: data.comparePrice || null,
       sku: data.sku || null,
+      slug: data.slug,
       stock: typeof data.stock === 'number' ? data.stock : undefined,
       weight:
         data.weight && data.weight.toString().trim() !== ''

@@ -22,20 +22,28 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com',
   ),
-  title: 'Deshi Home Decor - Premium Home Lighting & Decor',
+  title: 'Deshi Home Decor | Premium Home Lighting & Decor',
   description:
-    'Discover Deshi Home Decor’s curated collection of handcrafted Bengali-inspired lighting and home decor pieces that bring a warm, luxurious ambiance to your space.',
+    'Discover Deshi Home Decor’s curated collection of handcrafted bamboo, rattan, jute, and premium lighting to bring a warm, luxurious ambiance to your space in Bangladesh.',
   keywords: [
     'Deshi Home Decor',
-    'home decor',
-    'lighting',
-    'lamps',
+    'bamboo decor',
+    'rattan furniture',
+    'home lighting',
     'Bangladeshi decor',
-    'Bengali decor',
+    'handcrafted pieces',
     'premium lighting',
+    'buy decor online bd',
+    'living room styling',
+    'home decor bangladesh',
+    'bamboo decor',
+    'rattan furniture',
+    'imported lighting',
+    'living room styling',
+    'home decor'
   ],
   openGraph: {
-    title: 'Deshi Home Decor - Premium Home Lighting & Decor',
+    title: 'Deshi Home Decor | Premium Home Lighting & Decor',
     description:
       'Explore handcrafted lighting and decor inspired by Bengali craftsmanship to transform your home with warm, luxurious light.',
     type: 'website',
@@ -44,9 +52,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Deshi Home Decor - Premium Home Lighting & Decor',
+    title: 'Deshi Home Decor | Premium Home Lighting & Decor',
     description:
       'Explore handcrafted lighting and decor inspired by Bengali craftsmanship to transform your home with warm, luxurious light.',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   manifest: '/manifest.webmanifest',
   icons: {

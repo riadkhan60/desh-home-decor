@@ -4,17 +4,28 @@ import { CONTACT } from '@/lib/constants/contact';
 import { Phone, MessageCircle, Facebook, Instagram } from 'lucide-react';
 
 export const metadata = {
-  title: 'Contact Us - Deshi Home Decor',
+  title: 'Contact Us | Deshi Home Decor Customer Support',
   description:
-    'Get in touch with Deshi Home Decor. Call us, message on WhatsApp, or connect on Facebook and Instagram.',
+    'Get in touch with Deshi Home Decor. Call us, message us on WhatsApp, or connect with our team on Facebook and Instagram for your home decor needs.',
+  keywords:
+    'contact deshi home decor, customer support bangladesh, bamboo decor inquiries, buy rattan furniture online, home decor help',
   openGraph: {
-    title: 'Contact Us | Deshi Home Decor',
-    description: 'Call, WhatsApp, Facebook, Instagram – we\'d love to hear from you.',
-    url: '/contact',
+    title: 'Contact Deshi Home Decor',
+    description:
+      "Questions about our bamboo or rattan products? Call, WhatsApp, Facebook, or Instagram – we'd love to hear from you.",
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/contact`,
+    siteName: 'Deshi Home Decor',
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
     card: 'summary',
     title: 'Contact Us | Deshi Home Decor',
+    description:
+      'Get in touch with our support team for any home decor inquiries.',
+  },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/contact`,
   },
 };
 

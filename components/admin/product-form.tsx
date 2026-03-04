@@ -48,6 +48,7 @@ export function ProductForm({
     price: initialData?.price || '',
     comparePrice: initialData?.comparePrice || '',
     sku: initialData?.sku || '',
+    slug: initialData?.slug || '',
     stock: initialData?.stock,
     weight: initialData?.weight || '',
     categoryId: initialData?.categoryId || '',
@@ -315,8 +316,64 @@ export function ProductForm({
           <input
             type="text"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) => {
+              const newName = e.target.value;
+              setFormData((prev) => {
+                // If this is a new product and they haven't manually typed a slug yet (or are editing it in tandem)
+                // we can auto-generate it. But to keep it simple, let's just generate it if the old slug matched the old name's generated version, or if it's empty
+                const oldGeneratedSlug = prev.name
+                  .trim()
+                  .toLowerCase()
+                  .replace(/[^\w\s-]/g, '')
+                  .replace(/[\s_-]+/g, '-');
+
+                const shouldUpdateSlug =
+                  !prev.slug || prev.slug === oldGeneratedSlug;
+
+                const newSlug = shouldUpdateSlug
+                  ? newName
+                      .trim()
+                      .toLowerCase()
+                      .replace(/[^\w\s-]/g, '')
+                      .replace(/[\s_-]+/g, '-')
+                  : prev.slug;
+
+                // SKU Auto-generation (DHD-ProductName)
+                const generateSkuFromName = (name: string) => {
+                  return `DHD-${name
+                    .trim()
+                    .toUpperCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_-]+/g, '-')}`;
+                };
+
+                const oldGeneratedSku = generateSkuFromName(prev.name);
+                const shouldUpdateSku =
+                  !prev.sku || prev.sku === oldGeneratedSku;
+                const newSku = shouldUpdateSku
+                  ? generateSkuFromName(newName)
+                  : prev.sku;
+
+                return { ...prev, name: newName, slug: newSlug, sku: newSku };
+              });
+            }}
             required
+            className="w-full rounded-lg border bg-background px-4 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Slug</label>
+          <input
+            type="text"
+            value={formData.slug}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                slug: e.target.value.toLowerCase().replace(/\s+/g, '-'),
+              })
+            }
+            placeholder="Auto-generated from name if left empty"
             className="w-full rounded-lg border bg-background px-4 py-2 text-sm"
           />
         </div>

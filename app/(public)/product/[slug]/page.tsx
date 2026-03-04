@@ -7,7 +7,7 @@ import { ProductImageGallery } from '@/components/product-image-gallery';
 import { ProductReviews } from '@/components/product-reviews';
 import { ProductDetailActions } from '@/components/product-detail-actions';
 import {
-  getProductById,
+  getProductBySlug,
   getProductReviews,
   getRelatedProducts,
 } from '@/lib/actions/product-detail';
@@ -19,11 +19,11 @@ export const revalidate = 3600;
 
 // Dynamic Metadata Generation
 export async function generateMetadata(
-  props: { params: Promise<{ id: string }> },
+  props: { params: Promise<{ slug: string }> },
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const params = await props.params;
-  const product = await getProductById(params.id);
+  const product = await getProductBySlug(params.slug);
 
   if (!product) {
     return {
@@ -34,22 +34,46 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: `${product.name} | Deshi Home Decor`,
+    title: `${product.name} | Premium Deshi Home Decor & Lighting`,
     description:
       product.description?.slice(0, 160) ||
-      `Buy ${product.name} at Deshi Home Decor. Premium home decor and lighting.`,
+      `Buy ${product.name} at Deshi Home Decor. Handcrafted premium home decor, bamboo, rattan, and lighting in Bangladesh.`,
+    keywords: [
+      product.name,
+      'home decor',
+      'deshi home decor',
+      'lighting',
+      product.category?.name || 'decor',
+      'handcrafted',
+      'bangladesh',
+    ].join(', '),
     openGraph: {
-      title: product.name,
+      title: `${product.name} | Deshi Home Decor`,
       description: product.description?.slice(0, 160),
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/product/${product.slug}`,
+      siteName: 'Deshi Home Decor',
       images: product.featuredImage
-        ? [product.featuredImage, ...previousImages]
+        ? [
+            {
+              url: product.featuredImage,
+              width: 800,
+              height: 800,
+              alt: product.name,
+            },
+            ...previousImages,
+          ]
         : previousImages,
+      locale: 'en_US',
+      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: product.name,
       description: product.description?.slice(0, 160),
       images: product.featuredImage ? [product.featuredImage] : [],
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/product/${product.slug}`,
     },
   };
 }
@@ -58,17 +82,17 @@ export async function generateMetadata(
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
     where: { isActive: true },
-    select: { id: true },
+    select: { slug: true },
     take: 50, // Pre-generate top 50 products
   });
 
   return products.map((product) => ({
-    id: product.id,
+    slug: product.slug as string,
   }));
 }
 
 interface ProductPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 function formatPrice(value: string) {
@@ -78,11 +102,14 @@ function formatPrice(value: string) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params;
-  const [product, reviews] = await Promise.all([
-    getProductById(id),
-    getProductReviews(id),
-  ]);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product || !product.isActive) {
+    notFound();
+  }
+
+  const reviews = await getProductReviews(product.id);
 
   if (!product || !product.isActive) {
     notFound();
@@ -112,15 +139,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
     '@type': 'Product',
     name: product.name,
     image: product.featuredImage ? [product.featuredImage] : product.images,
-    description: product.description,
-    sku: product.id,
+    description:
+      product.description || `Buy ${product.name} at Deshi Home Decor`,
+    sku: product.sku || product.id,
     brand: {
       '@type': 'Brand',
       name: 'Deshi Home Decor',
     },
     offers: {
       '@type': 'Offer',
-      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/product/${product.id}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://deshihomedecor.com'}/product/${product.slug}`,
       priceCurrency: 'BDT',
       price: basePrice ?? minVariantPrice ?? 0,
       itemCondition: 'https://schema.org/NewCondition',
@@ -141,6 +169,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
               reviews.reduce((acc, r) => acc + (r.rating || 0), 0) /
               reviews.length,
             reviewCount: reviews.length,
+            bestRating: '5',
+            worstRating: '1',
           }
         : undefined,
   };
@@ -157,7 +187,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
       : basePrice
     : basePrice;
   const showPriceRange =
-    hasVariants && minVariantPrice != null && maxVariantPrice != null && minVariantPrice !== maxVariantPrice;
+    hasVariants &&
+    minVariantPrice != null &&
+    maxVariantPrice != null &&
+    minVariantPrice !== maxVariantPrice;
 
   const discount =
     !hasVariants &&
@@ -209,9 +242,33 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
           {/* Product Info */}
           <div className="space-y-6">
+            {/* Category & Collections Tags */}
+            <div className="flex flex-wrap items-center gap-2">
+              {product.category && (
+                <Link
+                  href={`/shop?category=${product.category.id}`}
+                  className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20"
+                >
+                  {product.category.name}
+                </Link>
+              )}
+              {product.collections?.map((pc) => (
+                <Link
+                  key={pc.collection.id}
+                  href={`/shop?collection=${pc.collection.slug}`}
+                  className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-wider text-secondary-foreground transition-colors hover:bg-secondary/80"
+                >
+                  {pc.collection.name}
+                </Link>
+              ))}
+            </div>
+
             {/* Title */}
             <div>
-              <BanglaText as="h1" className="text-3xl font-medium tracking-tight sm:text-4xl text-foreground/90">
+              <BanglaText
+                as="h1"
+                className="text-3xl font-medium tracking-tight sm:text-4xl text-foreground/90"
+              >
                 {product.name}
               </BanglaText>
             </div>
@@ -220,7 +277,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="flex items-baseline gap-3 flex-wrap">
               {showPriceRange ? (
                 <span className="text-2xl font-semibold tracking-tight text-foreground">
-                  {formatPrice(String(minVariantPrice))} - {formatPrice(String(maxVariantPrice))}
+                  {formatPrice(String(minVariantPrice))} -{' '}
+                  {formatPrice(String(maxVariantPrice))}
                 </span>
               ) : displayPrice != null ? (
                 <>
@@ -258,7 +316,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   featuredImage: product.featuredImage,
                   stock: totalStock,
                   stockShow: product.stockShow ?? false,
-                  weight: product.weight != null ? Number(product.weight) : null,
+                  weight:
+                    product.weight != null ? Number(product.weight) : null,
                   categoryName: product.category?.name,
                   options: product.options,
                   variants: activeVariants.map((v) => ({
@@ -279,7 +338,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="mt-12 max-w-3xl">
             <h2 className="mb-4 text-2xl font-bold">Description</h2>
             <div className="prose prose-neutral dark:prose-invert max-w-none">
-              <BanglaText as="p" className="leading-relaxed text-muted-foreground whitespace-pre-line">
+              <BanglaText
+                as="p"
+                className="leading-relaxed text-muted-foreground whitespace-pre-line"
+              >
                 {product.description}
               </BanglaText>
             </div>
@@ -322,7 +384,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 return (
                   <Link
                     key={rp.id}
-                    href={`/product/${rp.id}`}
+                    href={`/product/${rp.slug || rp.id}`}
                     className="group rounded-xl border bg-card p-3 transition hover:shadow-md"
                   >
                     <div className="relative mb-3 aspect-square overflow-hidden rounded-lg bg-muted">
@@ -346,7 +408,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                           {rp.category.name}
                         </p>
                       )}
-                      <BanglaText as="p" className="line-clamp-2 text-sm font-medium">
+                      <BanglaText
+                        as="p"
+                        className="line-clamp-2 text-sm font-medium"
+                      >
                         {rp.name}
                       </BanglaText>
                       <p className="text-sm font-semibold text-foreground">
